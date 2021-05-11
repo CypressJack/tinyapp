@@ -13,6 +13,11 @@
       <div class="card-body">
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+        <form  id='change<%= shortURL %>'method="POST" action="/urls/<%= shortURL %>/change">
+          <label for='newLongURL'>Enter a new Long URL for <%= shortURL %> to redirect to:</label><br>
+          <input type='text' id='newLongURL' name='newLongURL'>
+          <input type='button' id='submit' name='submit' value='Submit'>
+        </form>
       </div>
     <div class="card-footer text-muted"></div>
   </div>
