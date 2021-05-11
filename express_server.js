@@ -33,6 +33,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);// Respond with 'Ok' (we will replace this)
 });
 
+app.post("/urls/:id/change", (req,res)=>{
+  const newLongURL = req.body.newLongURL;
+  const id = req.params.id;
+  urlDatabase[id] = newLongURL;
+  res.redirect(`/urls/${id}`)
+})
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
