@@ -5,18 +5,27 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>URL - TinyApp Example</title>
 </head>
-
 <body>
   <%-include('partials/_header') %>
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+        <h4 class="card-title">TinyURL for: <%= longURL %></h4>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+        <h6 class='card-title'>Enter a new long URL for /<%= shortURL %> to redirect to:</h6>
         <form  id='change<%= shortURL %>'method="POST" action="/urls/<%= shortURL %>/change">
-          <label for='newLongURL'>Enter a new Long URL for <%= shortURL %> to redirect to:</label><br>
           <input type='text' id='newLongURL' name='newLongURL'>
-        </form> <button type='submit' form='change<%= shortURL %>' value='Submit'>Submit</button>
+        </form>
+        <br>
+        <button style='background-color: 	#5d5df3;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 18px;' type='submit' form='change<%= shortURL %>' value='Submit'>Submit</button>
       </div>
     <div class="card-footer text-muted"></div>
   </div>
