@@ -18,6 +18,8 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <form id='delete<%= url %>'method="POST" action="/urls/<%= url %>/delete"></form>
+            <td><button form='delete<%= url %>' name='delete'>Delete</button></td>
           </tr>
         <% } %>
       </tbody>
