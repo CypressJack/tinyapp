@@ -9,12 +9,14 @@ const urlDatabase = {
 };
 
 const generateRandomString = () => {
-  Math.random().toString(36).slice(2,8);
+  return Math.random().toString(36).slice(2,8);
 };
 
 app.use(morgan('dev'));
 
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(bodyParser.json());
 
 app.set("view engine", "ejs");
 
@@ -24,7 +26,9 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  const randomShortURL = generateRandomString();
+  urlDatabase[randomShortURL] = req.body.longURL;
+  console.log(urlDatabase);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
