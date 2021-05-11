@@ -20,13 +20,29 @@
             <td><%= urls[url] %></td>
             <td>
               <a href="/urls/<%= url %>">
-                <button>Edit</button>
+                <button style='background-color: white;
+                border: 3px solid #4CAF50;
+                color: #4CAF50;
+                padding: 8px;
+                border-radius: 8px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 18px;'>Edit</button>
              </a>
             </td>
             <td>
               <form id='delete<%= url %>'method="POST" action="/urls/<%= url %>/delete">
               </form>
-              <button type='submit' form='delete<%= url %>' value='Delete'>Delete</button>
+              <button style='background-color: white;
+              border: 3px solid #FF5733;
+              color: #FF5733;
+              padding: 8px;
+              border-radius: 8px;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-size: 18px;' type='submit' form='delete<%= url %>' value='Delete'>Delete</button>
             </td>
           </tr>
         <% } %>
