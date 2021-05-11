@@ -25,8 +25,8 @@
             </td>
             <td>
               <form id='delete<%= url %>'method="POST" action="/urls/<%= url %>/delete">
-                <input type='button' id='delete' name='delete' value='Delete'>
               </form>
+              <button type='submit' form='delete<%= url %>' value='Delete'>Delete</button>
             </td>
           </tr>
         <% } %>
