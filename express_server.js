@@ -7,7 +7,7 @@ const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
-let username;
+const cookieParser = require('cookie-parser');
 
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
@@ -19,18 +19,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 
+app.use(cookieParser());
+
 app.set("view engine", "ejs");
 
 app.post('/login', (req, res)=> {
-  username = req.body.username;
+  const username = req.body.username;
   console.log(username);
   res.cookie('username', username);
   res.redirect('/urls');
 })
 
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    // username: req.cookies["username"], 
+  const templateVars = { 
+    username: req.cookies["username"],
     urls: urlDatabase
    };
   res.render("urls_index", templateVars);
@@ -54,12 +56,15 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = { 
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
-    // username: req.cookies["username"],
+    username: req.cookies["username"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };
