@@ -21,6 +21,18 @@ const urlDatabase = {
 };
 const cookieParser = require('cookie-parser');
 
+// Returns a boolean for if the email exists in the users database
+const emailLookup = (email) => {
+  for (user in users) {
+    if (email === users[user].email){
+      return true
+    }
+  }
+  return false;
+};
+
+console.log(emailLookup('user2@example.com'));
+
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
