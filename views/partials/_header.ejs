@@ -10,7 +10,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <% if (!username) { %>
+    <% if (!user.email) { %>
     <form style='padding-right: 20px; padding-top: 10px; padding-left: 20px;' id='login' method="POST" action="/login">
       <input type='text' id='loginInput' name='username' placeholder="username">
       <button style='background-color: 	#3366BB;
@@ -24,7 +24,7 @@
     font-size: 18px;' type='submit' form='login' value='Login'>login</button>
     </form>
     <% } else { %>
-      <h4 style='padding-right: 10px;'>Logged in as: <%= username %></h4>
+      <h4 style='padding-right: 10px;'>Logged in as: <%= user.email %></h4>
       <form style='padding-right: 20px; padding-top: 10px;'id='logout' method="POST" action="/logout">
         <button style='background-color: 	#3366BB;
       border: none;
