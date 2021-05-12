@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
+  'b2xVn2': "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
 const cookieParser = require('cookie-parser');
