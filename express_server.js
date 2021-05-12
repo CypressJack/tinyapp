@@ -31,8 +31,6 @@ const emailLookup = (email) => {
   return false;
 };
 
-console.log(emailLookup('user2@example.com'));
-
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
@@ -135,12 +133,23 @@ app.get("/register", (req, res)=>{
 app.post('/register',(req, res)=>{
   const userID = generateRandomString();
   const formData = req.body;
-  users[userID] = {};
-  users[userID].id = userID;
-  users[userID].email = formData.email;
-  users[userID].password = formData.password;
-  res.cookie('user_id', users[userID].id);
-  res.redirect('/urls');
+  const email = formData.email;
+  const password = formData.password;
+  if (!emailLookup(email) && email.length !== 0 && password.length !== 0) {
+    users[userID] = {};
+    users[userID].id = userID;
+    users[userID].email = email;
+    users[userID].password = password;
+    res.cookie('user_id', users[userID].id);
+    res.redirect('/urls');
+  } 
+  if (emailLookup(email)) {
+    res.status(400);
+    res.send('HTTP ERROR 400: Email already Belongs to a user');
+  } else {
+    res.status(400);
+    res.send('HTTP ERROR 400');
+  }
 });
 
 app.get("/hello", (req, res) => {
