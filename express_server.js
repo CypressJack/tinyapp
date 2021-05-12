@@ -120,7 +120,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const currUser = req.cookies["user_id"];
   const templateVars = {
-    //Username must be passed in to templateVars so _header works
     user: users[currUser],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
