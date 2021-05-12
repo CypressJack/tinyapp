@@ -4,31 +4,38 @@ const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const users = {
-  "userRandomID": {
+  userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "purple-monkey-dinosaur",
   },
-  "user2RandomID": {
+  user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+    password: "dishwasher-funk",
+  },
 };
 const urlDatabase = {
-  'b2xVn2': "http://www.lighthouselabs.ca",
+  b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
-// Returns a boolean for if the email exists in the users database
+// Returns an object with user info if the email is found, and a false boolean if it is not found
 const emailLookup = (email) => {
-  for (user in users) {
-    if (email === users[user].email){
-      return true
+  let result = {};
+  for (user in users)
+    if (email === users[user].email) {
+      console.log("exists")
+      result.exists = true;
+      result.id = users[user].id;
+      result.email = users[user].email;
+      result.password = users[user].password;
+      return result;
+    } else {
+      result.exists = false;
     }
-  }
-  return false;
+    return result;
 };
 
 const generateRandomString = () => {
@@ -45,32 +52,43 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-app.get('/login', (req, res)=>{
-  const currUser = req.cookies['user_id'];
-  const templateVars = {
-    user: users[currUser]
-  };
-  res.render('login', templateVars);
-});
-
-app.post('/login', (req, res)=> {
-  // if (emailLookup(req.body.email)) {
-  //   res.cookie('username', username);
-  //   res.redirect('/urls');
-  // }
-})
-
-app.post('/logout', (req, res)=> {
-  res.clearCookie('user_id');
-  res.redirect('/urls');
-})
-
-app.get("/urls", (req, res) => {
-  const currUser = req.cookies['user_id'];
+app.get("/login", (req, res) => {
+  const currUser = req.cookies["user_id"];
   const templateVars = {
     user: users[currUser],
-    urls: urlDatabase
-   };
+  };
+  res.render("login", templateVars);
+});
+
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const userInfo = emailLookup(email);
+  if (!userInfo.exists) {
+    res.status(403);
+  }
+  if (userInfo.exists) {
+    if (password !== userInfo.password) {
+      res.status(403);
+    }
+    if (password === userInfo.password) {
+      res.cookie('user_id', userInfo.id);
+      res.redirect('/urls');
+    }
+  }
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id");
+  res.redirect("/urls");
+});
+
+app.get("/urls", (req, res) => {
+  const currUser = req.cookies["user_id"];
+  const templateVars = {
+    user: users[currUser],
+    urls: urlDatabase,
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -92,15 +110,15 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const currUser = req.cookies['user_id'];
-  const templateVars = { 
-    user: users[currUser]
+  const currUser = req.cookies["user_id"];
+  const templateVars = {
+    user: users[currUser],
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const currUser = req.cookies['user_id'];
+  const currUser = req.cookies["user_id"];
   const templateVars = {
     //Username must be passed in to templateVars so _header works
     user: users[currUser],
@@ -130,34 +148,35 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/register", (req, res)=>{
-  const currUser = req.cookies['user_id'];
+app.get("/register", (req, res) => {
+  const currUser = req.cookies["user_id"];
   const templateVars = {
-    user: users[currUser]
-  }
+    user: users[currUser],
+  };
   console.log(currUser);
   res.render("register", templateVars);
 });
 
-app.post('/register',(req, res)=>{
+app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const formData = req.body;
   const email = formData.email;
   const password = formData.password;
-  if (!emailLookup(email) && email.length !== 0 && password.length !== 0) {
+  const userInfo = emailLookup(email);
+  if (!userInfo.exists && email.length !== 0 && password.length !== 0) {
     users[userID] = {};
     users[userID].id = userID;
     users[userID].email = email;
     users[userID].password = password;
-    res.cookie('user_id', users[userID].id);
-    res.redirect('/urls');
-  } 
-  if (emailLookup(email)) {
+    res.cookie("user_id", users[userID].id);
+    res.redirect("/urls");
+  }
+  if (userInfo.exists) {
     res.status(400);
-    res.send('HTTP ERROR 400: Email already Belongs to a user');
+    res.send("HTTP ERROR 400: Email already Belongs to a user");
   } else {
     res.status(400);
-    res.send('HTTP ERROR 400');
+    res.send("HTTP ERROR 400");
   }
 });
 
