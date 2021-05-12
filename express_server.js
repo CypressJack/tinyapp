@@ -3,6 +3,9 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+let userDatabase = {
+  "Steve": "qwerty"
+};
 const urlDatabase = {
   'b2xVn2': "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -36,7 +39,8 @@ app.post('/logout', (req, res)=> {
 })
 
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
+    //Username must be passed in to templateVars so _header works 
     username: req.cookies["username"],
     urls: urlDatabase
    };
@@ -61,7 +65,8 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
+    //Username must be passed in to templateVars so _header works 
     username: req.cookies["username"]
   };
   res.render("urls_new", templateVars);
@@ -69,6 +74,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
+    //Username must be passed in to templateVars so _header works
     username: req.cookies["username"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
@@ -94,6 +100,20 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/register", (req, res)=>{
+  const templateVars = {
+    //Username must be passed in to templateVars so _header works
+    username: req.cookies["username"]
+  }
+  res.render("register", templateVars);
+});
+
+app.post('/register',(req, res)=>{
+  const formData = req.body;
+  console.log(req.body);
+  userDatabase[formData.email] = formData.password;
 });
 
 app.get("/hello", (req, res) => {
