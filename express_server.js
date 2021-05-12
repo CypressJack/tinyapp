@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+let loggedIn = false;
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -26,7 +27,7 @@ const emailLookup = (email) => {
   let result = {};
   for (user in users)
     if (email === users[user].email) {
-      console.log("exists")
+      console.log("exists");
       result.exists = true;
       result.id = users[user].id;
       result.email = users[user].email;
@@ -35,7 +36,7 @@ const emailLookup = (email) => {
     } else {
       result.exists = false;
     }
-    return result;
+  return result;
 };
 
 const generateRandomString = () => {
@@ -72,8 +73,9 @@ app.post("/login", (req, res) => {
       res.status(403);
     }
     if (password === userInfo.password) {
-      res.cookie('user_id', userInfo.id);
-      res.redirect('/urls');
+      res.cookie("user_id", userInfo.id);
+      res.redirect("/urls");
+      loggedIn = true;
     }
   }
 });
@@ -81,6 +83,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
+  loggedIn = false;
 });
 
 app.get("/urls", (req, res) => {
@@ -110,11 +113,16 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const currUser = req.cookies["user_id"];
-  const templateVars = {
-    user: users[currUser],
-  };
-  res.render("urls_new", templateVars);
+  if (loggedIn) {
+    const currUser = req.cookies["user_id"];
+    const templateVars = {
+      user: users[currUser],
+    };
+    res.render("urls_new", templateVars);
+  }
+  if (!loggedIn){
+    res.redirect('/login');
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
