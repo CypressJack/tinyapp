@@ -3,8 +3,17 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-let userDatabase = {
-  "Steve": "qwerty"
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
 };
 const urlDatabase = {
   'b2xVn2': "http://www.lighthouselabs.ca",
@@ -39,9 +48,9 @@ app.post('/logout', (req, res)=> {
 })
 
 app.get("/urls", (req, res) => {
+  const currUser = req.cookies['user_id'];
   const templateVars = {
-    //Username must be passed in to templateVars so _header works 
-    username: req.cookies["username"],
+    user: users[currUser],
     urls: urlDatabase
    };
   res.render("urls_index", templateVars);
@@ -65,17 +74,18 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    //Username must be passed in to templateVars so _header works 
-    username: req.cookies["username"]
+  const currUser = req.cookies['user_id'];
+  const templateVars = { 
+    user: users[currUser]
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  const currUser = req.cookies['user_id'];
   const templateVars = {
     //Username must be passed in to templateVars so _header works
-    username: req.cookies["username"],
+    user: users[currUser],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };
@@ -105,15 +115,20 @@ app.get("/urls.json", (req, res) => {
 app.get("/register", (req, res)=>{
   const templateVars = {
     //Username must be passed in to templateVars so _header works
-    username: req.cookies["username"]
+    user: users
   }
   res.render("register", templateVars);
 });
 
 app.post('/register',(req, res)=>{
+  const userID = generateRandomString();
   const formData = req.body;
-  console.log(req.body);
-  userDatabase[formData.email] = formData.password;
+  users[userID] = {};
+  users[userID].id = userID;
+  users[userID].email = formData.email;
+  users[userID].password = formData.password;
+  res.cookie('user_id', users[userID].id);
+  res.redirect('/urls');
 });
 
 app.get("/hello", (req, res) => {
