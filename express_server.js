@@ -45,15 +45,23 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
+app.get('/login', (req, res)=>{
+  const currUser = req.cookies['user_id'];
+  const templateVars = {
+    user: users[currUser]
+  };
+  res.render('login', templateVars);
+});
+
 app.post('/login', (req, res)=> {
-  const username = req.body.username;
-  console.log(username);
-  res.cookie('username', username);
-  res.redirect('/urls');
+  // if (emailLookup(req.body.email)) {
+  //   res.cookie('username', username);
+  //   res.redirect('/urls');
+  // }
 })
 
 app.post('/logout', (req, res)=> {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 })
 
@@ -123,10 +131,11 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/register", (req, res)=>{
+  const currUser = req.cookies['user_id'];
   const templateVars = {
-    //Username must be passed in to templateVars so _header works
-    user: users
+    user: users[currUser]
   }
+  console.log(currUser);
   res.render("register", templateVars);
 });
 
