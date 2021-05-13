@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const { getUserByEmail } = require("./helpers");
 let loggedIn = false;
 const users = {
   userRandomID: {
@@ -30,23 +31,6 @@ const urlDatabase = {
   hjo49s: { longURL: "http://www.msn.ca", userID: "example" },
   lro3cs: { longURL: "http://www.amazon.com", userID: "example" },
   qpe451: { longURL: "http://www.github.com", userID: "example" },
-};
-
-// Returns an object with user info if the email is found, and a false boolean if it is not found
-const getUserByEmail = (email, database) => {
-  let result = {};
-  for (user in database)
-    if (email === database[user].email) {
-      console.log("exists");
-      result.exists = true;
-      result.id = database[user].id;
-      result.email = database[user].email;
-      result.password = database[user].password;
-      return result;
-    } else {
-      result.exists = false;
-    }
-  return result;
 };
 
 const generateRandomString = () => {
@@ -97,7 +81,7 @@ app.post("/login", (req, res) => {
       res.redirect('/login');
     }
     if (bcrypt.compareSync(password, userInfo.password)) {
-      res.session.user_id = userInfo.id;
+      req.session.user_id = userInfo.id;
       res.redirect("/urls");
       loggedIn = true;
     }
