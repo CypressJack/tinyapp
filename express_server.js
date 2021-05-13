@@ -3,9 +3,13 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-const bcrypt = require('bcrypt');
-const cookieSession = require('cookie-session');
-const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
+const bcrypt = require("bcrypt");
+const cookieSession = require("cookie-session");
+const {
+  getUserByEmail,
+  generateRandomString,
+  urlsForUser,
+} = require("./helpers");
 let loggedIn = false;
 const users = {
   userRandomID: {
@@ -39,12 +43,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 
-app.use(cookieSession({
-  name: "banana",
-  keys: ["orange", 'apple']
-}));
+app.use(
+  cookieSession({
+    name: "banana",
+    keys: ["orange", "apple"],
+  })
+);
 
 app.set("view engine", "ejs");
+
+app.get("/", (req, res) => {
+  if (loggedIn) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
+});
 
 app.get("/login", (req, res) => {
   const currUser = req.session.user_id;
@@ -54,17 +68,34 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+app.get("/access_error", (req, res) => {
+  const currUser = req.session.user_id;
+  const templateVars = {
+    user: users[currUser],
+  };
+  res.render("access_error", templateVars);
+});
+
+app.get("/login_error", (req, res) => {
+  const currUser = req.session.user_id;
+  const templateVars = {
+    user: users[currUser],
+  };
+  res.render("login_error", templateVars);
+});
+
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const userInfo = getUserByEmail(email, users);
   if (!userInfo.exists) {
     res.status(403);
+    res.redirect('/login_error');
   }
   if (userInfo.exists) {
     if (!bcrypt.compareSync(password, userInfo.password)) {
       res.status(403);
-      res.redirect('/login');
+      res.redirect("/login");
     }
     if (bcrypt.compareSync(password, userInfo.password)) {
       req.session.user_id = userInfo.id;
@@ -83,7 +114,7 @@ app.post("/logout", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const currUser = req.session.user_id;
-  const usersURLS = urlsForUser(currUser);
+  const usersURLS = urlsForUser(currUser, urlDatabase);
   const templateVars = {
     loggedIn: loggedIn,
     user: users[currUser],
@@ -131,21 +162,30 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const currUser = req.session.user_id;
-  const templateVars = {
-    user: users[currUser],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-  };
-  res.render("urls_show", templateVars);
+  if (urlDatabase[req.params.shortURL]) {
+    const currUser = req.session.user_id;
+    const templateVars = {
+      user: users[currUser],
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+    };
+    if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
+      res.render("urls_show", templateVars);
+    } else {
+      res.redirect("/access_error");
+    }
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect(`/urls`);
+  } else {
+    res.redirect('/access_error');
   }
-  res.redirect(`/urls`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
