@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 let loggedIn = false;
 const users = {
   userRandomID: {
@@ -88,10 +89,11 @@ app.post("/login", (req, res) => {
     res.status(403);
   }
   if (userInfo.exists) {
-    if (password !== userInfo.password) {
+    if (!bcrypt.compareSync(password, userInfo.password)) {
       res.status(403);
+      res.redirect('/login');
     }
-    if (password === userInfo.password) {
+    if (bcrypt.compareSync(password, userInfo.password)) {
       res.cookie("user_id", userInfo.id);
       res.redirect("/urls");
       loggedIn = true;
@@ -202,17 +204,17 @@ app.post("/register", (req, res) => {
   const formData = req.body;
   const email = formData.email;
   const password = formData.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const userInfo = emailLookup(email);
   if (!userInfo.exists && email.length !== 0 && password.length !== 0) {
     users[userID] = {};
     users[userID].id = userID;
     users[userID].email = email;
-    users[userID].password = password;
+    users[userID].password = hashedPassword;
     res.cookie("user_id", users[userID].id);
     res.redirect("/urls");
     loggedIn = true;
-  }
-  if (userInfo.exists) {
+  } else if (userInfo.exists) {
     res.status(400);
     res.send("HTTP ERROR 400: Email already Belongs to a user");
   } else {
