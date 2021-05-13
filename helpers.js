@@ -18,11 +18,11 @@ const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
 
-const urlsForUser = (id) => {
+const urlsForUser = (id, database) => {
   let matches = {};
-  for (url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      matches[url] = urlDatabase[url];
+  for (url in database) {
+    if (database[url].userID === id) {
+      matches[url] = database[url];
     }
   }
   return matches;
