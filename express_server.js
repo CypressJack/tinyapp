@@ -15,10 +15,19 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
+  example: {
+    id: "example",
+    email: "example@example.com",
+    password: "example",
+  },
 };
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" }
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
+  "gy78s9": { longURL: "http://www.yahoo.com", userID: "userRandomID" },
+  "hjo49s": { longURL: "http://www.msn.ca", userID: "example" },
+  "lro3cs": { longURL: "http://www.amazon.com", userID: "example" },
+  "qpe451": { longURL: "http://www.github.com", userID: "example" }
 };
 const cookieParser = require("cookie-parser");
 
@@ -41,6 +50,16 @@ const emailLookup = (email) => {
 
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
+};
+
+const urlsForUser = (id)=>{
+  let matches = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      matches[url] = urlDatabase[url];
+    }
+  }
+  return matches
 };
 
 app.use(morgan("dev"));
@@ -89,9 +108,11 @@ app.post("/logout", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const currUser = req.cookies["user_id"];
+  const usersURLS = urlsForUser(currUser);
   const templateVars = {
+    loggedIn: loggedIn,
     user: users[currUser],
-    urls: urlDatabase,
+    urls: usersURLS,
   };
   res.render("urls_index", templateVars);
 });
