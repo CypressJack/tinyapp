@@ -33,15 +33,15 @@ const urlDatabase = {
 };
 
 // Returns an object with user info if the email is found, and a false boolean if it is not found
-const emailLookup = (email) => {
+const getUserByEmail = (email, database) => {
   let result = {};
-  for (user in users)
-    if (email === users[user].email) {
+  for (user in database)
+    if (email === database[user].email) {
       console.log("exists");
       result.exists = true;
-      result.id = users[user].id;
-      result.email = users[user].email;
-      result.password = users[user].password;
+      result.id = database[user].id;
+      result.email = database[user].email;
+      result.password = database[user].password;
       return result;
     } else {
       result.exists = false;
@@ -87,7 +87,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const userInfo = emailLookup(email);
+  const userInfo = getUserByEmail(email, users);
   if (!userInfo.exists) {
     res.status(403);
   }
@@ -208,7 +208,7 @@ app.post("/register", (req, res) => {
   const email = formData.email;
   const password = formData.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const userInfo = emailLookup(email);
+  const userInfo = getUserByEmail(email, users);
   if (!userInfo.exists && email.length !== 0 && password.length !== 0) {
     users[userID] = {};
     users[userID].id = userID;
