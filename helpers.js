@@ -14,6 +14,22 @@ const getUserByEmail = (email, database) => {
   return result;
 };
 
+const generateRandomString = () => {
+  return Math.random().toString(36).slice(2, 8);
+};
+
+const urlsForUser = (id) => {
+  let matches = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      matches[url] = urlDatabase[url];
+    }
+  }
+  return matches;
+};
+
 module.exports = {
-  getUserByEmail
+  getUserByEmail,
+  generateRandomString,
+  urlsForUser
 }

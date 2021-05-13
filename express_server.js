@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 let loggedIn = false;
 const users = {
   userRandomID: {
@@ -31,20 +31,6 @@ const urlDatabase = {
   hjo49s: { longURL: "http://www.msn.ca", userID: "example" },
   lro3cs: { longURL: "http://www.amazon.com", userID: "example" },
   qpe451: { longURL: "http://www.github.com", userID: "example" },
-};
-
-const generateRandomString = () => {
-  return Math.random().toString(36).slice(2, 8);
-};
-
-const urlsForUser = (id) => {
-  let matches = {};
-  for (url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      matches[url] = urlDatabase[url];
-    }
-  }
-  return matches;
 };
 
 app.use(morgan("dev"));
