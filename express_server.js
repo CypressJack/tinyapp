@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session');
 let loggedIn = false;
 const users = {
   userRandomID: {
@@ -30,7 +31,6 @@ const urlDatabase = {
   lro3cs: { longURL: "http://www.amazon.com", userID: "example" },
   qpe451: { longURL: "http://www.github.com", userID: "example" },
 };
-const cookieParser = require("cookie-parser");
 
 // Returns an object with user info if the email is found, and a false boolean if it is not found
 const emailLookup = (email) => {
@@ -69,12 +69,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 
-app.use(cookieParser());
+app.use(cookieSession({
+  name: "banana",
+  keys: ["orange", 'apple']
+}));
 
 app.set("view engine", "ejs");
 
 app.get("/login", (req, res) => {
-  const currUser = req.cookies["user_id"];
+  const currUser = req.session.user_id;
   const templateVars = {
     user: users[currUser],
   };
@@ -94,7 +97,7 @@ app.post("/login", (req, res) => {
       res.redirect('/login');
     }
     if (bcrypt.compareSync(password, userInfo.password)) {
-      res.cookie("user_id", userInfo.id);
+      res.session.user_id = userInfo.id;
       res.redirect("/urls");
       loggedIn = true;
     }
@@ -103,13 +106,13 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls");
   loggedIn = false;
 });
 
 app.get("/urls", (req, res) => {
-  const currUser = req.cookies["user_id"];
+  const currUser = req.session.user_id;
   const usersURLS = urlsForUser(currUser);
   const templateVars = {
     loggedIn: loggedIn,
@@ -122,7 +125,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {};
-  urlDatabase[shortURL].userID = req.cookies["user_id"];
+  urlDatabase[shortURL].userID = req.session.user_id;
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
   console.log(urlDatabase);
@@ -131,7 +134,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/change", (req, res) => {
   const newLongURL = req.body.newLongURL;
   const id = req.params.id;
-  if (req.cookies["user_id"] === urlDatabase[req.params.id].userID) {
+  if (req.session.user_id === urlDatabase[req.params.id].userID) {
     if (newLongURL.length !== 0) {
       urlDatabase[id].longURL = newLongURL;
       res.redirect(`/urls/${id}`);
@@ -146,7 +149,7 @@ app.post("/urls/:id/change", (req, res) => {
 app.get("/urls/new", (req, res) => {
   console.log(loggedIn);
   if (loggedIn) {
-    const currUser = req.cookies["user_id"];
+    const currUser = req.session.user_id;
     const templateVars = {
       user: users[currUser],
     };
@@ -158,7 +161,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const currUser = req.cookies["user_id"];
+  const currUser = req.session.user_id;
   const templateVars = {
     user: users[currUser],
     shortURL: req.params.shortURL,
@@ -168,7 +171,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (req.cookies["user_id"] === urlDatabase[req.params.shortURL].userID) {
+  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect(`/urls`);
   }
@@ -191,7 +194,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const currUser = req.cookies["user_id"];
+  const currUser = req.session.user_id;
   const templateVars = {
     user: users[currUser],
   };
@@ -211,7 +214,7 @@ app.post("/register", (req, res) => {
     users[userID].id = userID;
     users[userID].email = email;
     users[userID].password = hashedPassword;
-    res.cookie("user_id", users[userID].id);
+    req.session.user_id = users[userID].id;
     res.redirect("/urls");
     loggedIn = true;
   } else if (userInfo.exists) {
