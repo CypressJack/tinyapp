@@ -27,7 +27,7 @@ And that should be it! You're free to browse and use the application
 ## Troubleshooting
 If you get errors starting the server make sure you are using nodejs v12
 
-## Dependancies
+## Dependencies
 - bcrypt
 - body-parser
 - cookie-session
