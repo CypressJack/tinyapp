@@ -70,6 +70,7 @@ app.get("/", (req, res) => {
   }
 });
 
+// Login page
 app.get("/login", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -112,6 +113,7 @@ app.get("/register_error", (req, res) => {
 All other routes
 */
 
+// Login form submission
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -132,13 +134,13 @@ app.post("/login", (req, res) => {
     }
   }
 });
-
+// Clear cookie session on logout
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
   loggedIn = false;
 });
-
+// Dynamic URLs page
 app.get("/urls", (req, res) => {
   const currUser = req.session.user_id;
   const usersURLS = urlsForUser(currUser, urlDatabase);
@@ -149,7 +151,7 @@ app.get("/urls", (req, res) => {
   };
   res.render("urls_index", templateVars);
 });
-
+// Form to create a new shortURL
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {};
@@ -157,7 +159,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
-
+// Change the longURL of an existing shortURL
 app.post("/urls/:id/change", (req, res) => {
   const newLongURL = req.body.newLongURL;
   const id = req.params.id;
@@ -172,7 +174,7 @@ app.post("/urls/:id/change", (req, res) => {
     res.redirect(`/urls/${id}`);
   }
 });
-
+// Page to create a new shortURL
 app.get("/urls/new", (req, res) => {
   if (loggedIn) {
     const currUser = req.session.user_id;
@@ -185,7 +187,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
   }
 });
-
+// Edit shortURL page
 app.get("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const currUser = req.session.user_id;
@@ -203,7 +205,7 @@ app.get("/urls/:shortURL", (req, res) => {
     res.redirect("/urls");
   }
 });
-
+// Delete shortURL button
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
@@ -212,17 +214,17 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.redirect('/access_error');
   }
 });
-
+// Redirect for each shortURL
 app.get("/u/:shortURL", (req, res) => {
-  const shortURL = req.url.slice(3);
+  const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
-
+// API for grabbing urlDatabase
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-
+// Create an account page
 app.get("/register", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -230,7 +232,7 @@ app.get("/register", (req, res) => {
   };
   res.render("register", templateVars);
 });
-
+// Create an account form
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const formData = req.body;
@@ -254,11 +256,7 @@ app.post("/register", (req, res) => {
     res.redirect("/register_error");
   }
 });
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
+// HTTP request listener
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
