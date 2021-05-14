@@ -1,3 +1,4 @@
+// Import revelant modules and helper functions
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -10,13 +11,14 @@ const {
   generateRandomString,
   urlsForUser,
 } = require("./helpers");
+
+// Keeps tracked of logged in status
 let loggedIn = false;
 
-
+// Initialize data structure of example users with hashed passwords
 const defUser1Pass = bcrypt.hashSync("purple-monkey-dinosaur", 10);
 const defUser2Pass = bcrypt.hashSync("dishwasher-funk", 10);
 const defUser3Pass = bcrypt.hashSync("example", 10);
-
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -34,6 +36,8 @@ const users = {
     password: defUser3Pass,
   },
 };
+
+// Initialize some example entries from example users
 const urlDatabase = {
   b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
@@ -43,21 +47,23 @@ const urlDatabase = {
   qpe451: { longURL: "http://www.github.com", userID: "example" },
 };
 
+// Initialize and set middleware for express server
 app.use(morgan("dev"));
-
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(bodyParser.json());
-
 app.use(
   cookieSession({
     name: "banana",
     keys: ["orange", "apple"],
   })
 );
-
 app.set("view engine", "ejs");
 
+
+
+/*
+ Begin route handlers
+ */
 app.get("/", (req, res) => {
   if (loggedIn) {
     res.redirect("/urls");
@@ -74,6 +80,7 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
+// Error pages
 app.get("/access_error", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -81,7 +88,6 @@ app.get("/access_error", (req, res) => {
   };
   res.render("access_error", templateVars);
 });
-
 app.get("/login_error", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -89,7 +95,6 @@ app.get("/login_error", (req, res) => {
   };
   res.render("login_error", templateVars);
 });
-
 app.get("/user_exists_error", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -97,7 +102,6 @@ app.get("/user_exists_error", (req, res) => {
   };
   res.render("user_exists_error", templateVars);
 });
-
 app.get("/register_error", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
@@ -105,6 +109,10 @@ app.get("/register_error", (req, res) => {
   };
   res.render("register_error", templateVars);
 });
+
+/* 
+All other routes
+*/
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -125,7 +133,6 @@ app.post("/login", (req, res) => {
       loggedIn = true;
     }
   }
-  console.log("loggedIn:", loggedIn);
 });
 
 app.post("/logout", (req, res) => {
@@ -151,7 +158,6 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL].userID = req.session.user_id;
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
-  console.log(urlDatabase);
 });
 
 app.post("/urls/:id/change", (req, res) => {
@@ -170,7 +176,6 @@ app.post("/urls/:id/change", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  console.log(loggedIn);
   if (loggedIn) {
     const currUser = req.session.user_id;
     const templateVars = {
@@ -213,12 +218,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.url.slice(3);
   const longURL = urlDatabase[shortURL].longURL;
-  // console.log(longURL);
   res.redirect(longURL);
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -230,7 +230,6 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user: users[currUser],
   };
-  console.log(currUser);
   res.render("register", templateVars);
 });
 
