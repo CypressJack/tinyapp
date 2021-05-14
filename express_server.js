@@ -11,21 +11,27 @@ const {
   urlsForUser,
 } = require("./helpers");
 let loggedIn = false;
+
+
+const defUser1Pass = bcrypt.hashSync("purple-monkey-dinosaur", 10);
+const defUser2Pass = bcrypt.hashSync("dishwasher-funk", 10);
+const defUser3Pass = bcrypt.hashSync("example", 10);
+
 const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: defUser1Pass,
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: defUser2Pass,
   },
   example: {
     id: "example",
     email: "example@example.com",
-    password: "example",
+    password: defUser3Pass,
   },
 };
 const urlDatabase = {
