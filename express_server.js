@@ -79,7 +79,9 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-// Error pages
+/*
+Error pages
+*/
 app.get("/access_error", (req, res) => {
   const currUser = req.session.user_id;
   const templateVars = {
