@@ -1,7 +1,7 @@
-// Returns an object with user info if the email is found, and a false boolean if it is not found
+// Returns an object of user info from the database
 const getUserByEmail = (email, database) => {
   let result = {};
-  for (user in database)
+  for (const user in database) {
     if (email === database[user].email) {
       result.exists = true;
       result.id = database[user].id;
@@ -11,16 +11,17 @@ const getUserByEmail = (email, database) => {
     } else {
       result.exists = false;
     }
+  }
   return result;
 };
-
+// Returns a random alphanumeric index 5 string
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
-
+// Finds URLs in database created by the searched for user
 const urlsForUser = (id, database) => {
   let matches = {};
-  for (url in database) {
+  for (const url in database) {
     if (database[url].userID === id) {
       matches[url] = database[url];
     }
@@ -31,5 +32,5 @@ const urlsForUser = (id, database) => {
 module.exports = {
   getUserByEmail,
   generateRandomString,
-  urlsForUser
-}
+  urlsForUser,
+};
