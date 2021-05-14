@@ -84,6 +84,22 @@ app.get("/login_error", (req, res) => {
   res.render("login_error", templateVars);
 });
 
+app.get("/user_exists_error", (req, res) => {
+  const currUser = req.session.user_id;
+  const templateVars = {
+    user: users[currUser],
+  };
+  res.render("user_exists_error", templateVars);
+});
+
+app.get("/register_error", (req, res) => {
+  const currUser = req.session.user_id;
+  const templateVars = {
+    user: users[currUser],
+  };
+  res.render("register_error", templateVars);
+});
+
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -229,10 +245,10 @@ app.post("/register", (req, res) => {
     loggedIn = true;
   } else if (userInfo.exists) {
     res.status(400);
-    res.send("HTTP ERROR 400: Email already Belongs to a user");
+    res.redirect("/user_exists_error");
   } else {
     res.status(400);
-    res.send("HTTP ERROR 400");
+    res.redirect("/register_error");
   }
 });
 
