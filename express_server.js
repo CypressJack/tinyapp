@@ -40,7 +40,7 @@ const users = {
 // Initialize some example entries from example users
 const urlDatabase = {
   b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
+  jsm5xK: { longURL: "http://www.google.com", userID: "user2RandomID" },
   gy78s9: { longURL: "http://www.yahoo.com", userID: "userRandomID" },
   hjo49s: { longURL: "http://www.msn.ca", userID: "example" },
   lro3cs: { longURL: "http://www.amazon.com", userID: "example" },
