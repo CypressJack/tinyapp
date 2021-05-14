@@ -3,6 +3,10 @@
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs
 
 ## Final Product
+!["Screenshot of welcome page](https://github.com/archaemedes/tinyapp/blob/master/docs/welcome-page.png?raw=true)
+
+!["Screenshot of register page"](https://github.com/archaemedes/tinyapp/blob/master/docs/register-page.png?raw=true)
+!["Screenshot of URLs page"](https://github.com/archaemedes/tinyapp/blob/master/docs/urls-page.png?raw=true)
 
 ## Getting Started
 CD into the tinyapp directory and install **nodejs** and the Javascript dependencies
