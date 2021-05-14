@@ -1,5 +1,10 @@
 # Tiny App
 
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs
+
+## Final Product
+
+## Getting Started
 CD into the tinyapp directory and install **nodejs** and the Javascript dependencies
 
     cd **your file path here**/tinyapp
