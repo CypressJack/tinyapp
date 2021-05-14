@@ -59,8 +59,6 @@ app.use(
 );
 app.set("view engine", "ejs");
 
-
-
 /*
  Begin route handlers
  */
@@ -110,7 +108,7 @@ app.get("/register_error", (req, res) => {
   res.render("register_error", templateVars);
 });
 
-/* 
+/*
 All other routes
 */
 
