@@ -159,6 +159,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {};
   urlDatabase[shortURL].userID = req.session.user_id;
   urlDatabase[shortURL].longURL = req.body.longURL;
+  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 // Change the longURL of an existing shortURL
@@ -218,9 +219,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 // Redirect for each shortURL
 app.get("/u/:shortURL", (req, res) => {
-  const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL].longURL;
-  res.redirect(longURL);
+  const short = req.params.shortURL;
+  const long = urlDatabase[short].longURL;
+  console.log(urlDatabase[short]);
+  res.redirect(long);
 });
 // API for grabbing urlDatabase
 app.get("/urls.json", (req, res) => {
