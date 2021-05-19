@@ -5,7 +5,7 @@
 <body>
   <%-include('partials/_header') %>
   <main style="margin: 1em;">
-    <% if (loggedIn) { %>
+    <% if (currUser) { %>
     <h3>My URLs</h3>
     <table class="table">
       <thead>

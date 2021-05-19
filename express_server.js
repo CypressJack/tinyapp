@@ -12,9 +12,6 @@ const {
   urlsForUser,
 } = require("./helpers");
 
-// Keeps tracked of logged in status
-let loggedIn = false;
-
 // Initialize data structure of example users with hashed passwords
 const defUser1Pass = bcrypt.hashSync("purple-monkey-dinosaur", 10);
 const defUser2Pass = bcrypt.hashSync("dishwasher-funk", 10);
@@ -63,7 +60,8 @@ app.set("view engine", "ejs");
  Begin route handlers
  */
 app.get("/", (req, res) => {
-  if (loggedIn) {
+  console.log(req.session.user_id);
+  if (req.session.user_id) {
     res.redirect("/urls");
   } else {
     res.redirect("/login");
@@ -132,7 +130,6 @@ app.post("/login", (req, res) => {
     if (bcrypt.compareSync(password, userInfo.password)) {
       req.session.user_id = userInfo.id;
       res.redirect("/urls");
-      loggedIn = true;
     }
   }
 });
@@ -140,14 +137,13 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/urls");
-  loggedIn = false;
 });
 // Dynamic URLs page
 app.get("/urls", (req, res) => {
   const currUser = req.session.user_id;
   const usersURLS = urlsForUser(currUser, urlDatabase);
   const templateVars = {
-    loggedIn: loggedIn,
+    currUser: currUser,
     user: users[currUser],
     urls: usersURLS,
   };
@@ -179,14 +175,14 @@ app.post("/urls/:id/change", (req, res) => {
 });
 // Page to create a new shortURL
 app.get("/urls/new", (req, res) => {
-  if (loggedIn) {
+  if (req.session.user_id) {
     const currUser = req.session.user_id;
     const templateVars = {
       user: users[currUser],
     };
     res.render("urls_new", templateVars);
   }
-  if (!loggedIn) {
+  if (!req.session.user_id) {
     res.redirect("/login");
   }
 });
@@ -251,7 +247,6 @@ app.post("/register", (req, res) => {
     users[userID].password = hashedPassword;
     req.session.user_id = users[userID].id;
     res.redirect("/urls");
-    loggedIn = true;
   } else if (userInfo.exists) {
     res.status(400);
     res.redirect("/user_exists_error");
